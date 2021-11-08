@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libmemcached-dev memcached libsasl2-dev sasl2-bin zlib1g-dev
+          sudo apt-get install libmemcached-dev memcached libsasl2-dev sasl2-bin zlib1g-dev libzstd-dev
       - name: Start memcached daemons
         run: |
           export SASL_CONF_PATH="/tmp/sasl2"
@@ -54,7 +54,8 @@ jobs:
             --enable-memcached-sasl \
             --enable-memcached-json \
             --enable-memcached-msgpack \
-            --enable-memcached-igbinary
+            --enable-memcached-igbinary \
+            --enable-zstd-compression
           make
           sudo make install
       - name: Create test configuration

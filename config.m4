@@ -24,6 +24,9 @@ PHP_ARG_ENABLE(memcached-sasl, whether to enable memcached sasl support,
 PHP_ARG_ENABLE(memcached-protocol, whether to enable memcached protocol support,
 [  --enable-memcached-protocol     Enable memcached protocol support], no, no)
 
+PHP_ARG_ENABLE(zstd-compression, whether to enable zstd compression support,
+[  --enable-zstd-compression       Enable zstd compression support], no, no)
+
 PHP_ARG_WITH(system-fastlz, whether to use system FastLZ library,
 [  --with-system-fastlz            Use system FastLZ library], no, no)
 
@@ -331,6 +334,18 @@ if test "$PHP_MEMCACHED" != "no"; then
 
     if test "$ac_cv_have_memcached_set_encoding_key" = "yes"; then
       AC_DEFINE(HAVE_MEMCACHED_SET_ENCODING_KEY, [1], [Whether memcached_set_encoding_key is defined])
+    fi
+
+    if test "$PHP_ZSTD_COMPRESSION" != "no"; then
+      AC_MSG_CHECKING([for zstd compression library])
+      AC_CHECK_HEADERS([zstd.h zstd_errors.h], [ac_cv_have_zstd="yes"], [ac_cv_have_zstd="no"])
+
+      if test "$ac_cv_have_zstd" == "yes"; then
+        PHP_CHECK_LIBRARY(zstd, ZSTD_compress,
+            [PHP_ADD_LIBRARY(zstd, 1, MEMCACHED_SHARED_LIBADD)],
+            [AC_MSG_ERROR("Zstd library not found")])
+        AC_DEFINE(HAVE_ZSTD,1,[Whether zstd compression support is enabled])
+      fi
     fi
 
     PHP_MEMCACHED_FILES="php_memcached.c php_libmemcached_compat.c  g_fmt.c"

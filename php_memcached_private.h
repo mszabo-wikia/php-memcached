@@ -47,6 +47,10 @@
 #include <ext/standard/php_var.h>
 #include <ext/standard/basic_functions.h>
 
+#ifdef HAVE_ZSTD
+#include <zstd.h>
+#endif
+
 #ifdef PHP_WIN32
 # include "win32/php_stdint.h"
 #else
@@ -94,7 +98,8 @@ typedef enum {
 
 typedef enum {
 	COMPRESSION_TYPE_ZLIB   = 1,
-	COMPRESSION_TYPE_FASTLZ = 2
+	COMPRESSION_TYPE_FASTLZ = 2,
+	COMPRESSION_TYPE_ZSTD   = 3
 } php_memc_compression_type;
 
 typedef struct {
@@ -198,6 +203,12 @@ ZEND_BEGIN_MODULE_GLOBALS(php_memcached)
 
 		} default_behavior;
 
+#ifdef HAVE_ZSTD
+		/* Thread-local Zstd compression context */
+		ZSTD_CCtx *zstd_compression_context;
+		/* Thread-local Zstd decompression context */
+		ZSTD_DCtx *zstd_decompression_context;
+#endif
 	} memc;
 
 	/* For deprecated values */
