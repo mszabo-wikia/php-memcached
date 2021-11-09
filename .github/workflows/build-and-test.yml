@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libmemcached-dev memcached libsasl2-dev sasl2-bin zlib1g-dev libzstd-dev
+          sudo apt-get install libmemcached-dev memcached libsasl2-dev sasl2-bin zlib1g-dev libzstd-dev valgrind
       - name: Start memcached daemons
         run: |
           export SASL_CONF_PATH="/tmp/sasl2"
@@ -83,3 +83,6 @@ jobs:
 
           # Run normal tests
           php run-tests.php --show-diff -d extension=modules/memcached.so ./tests/*.phpt
+
+          # Run tests with Valgrind
+          USE_ZEND_ALLOC=0 php run-tests.php -m --show-mem -d extension=modules/memcached.so ./tests/*.phpt
